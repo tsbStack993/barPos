@@ -2,6 +2,7 @@ import os
 from decimal import Decimal
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from main import Base, Category, Product, SessionLocal, User, engine
@@ -86,15 +87,23 @@ def seed_products(db: Session) -> int:
 
 def seed_admin(db: Session) -> bool:
     """Create the initial administrator only when the user table is empty."""
+    email = os.getenv("INITIAL_ADMIN_EMAIL", "admin@pos.local").strip().lower()
+    if db.scalar(select(User.id).where(User.email == email)) is not None:
+        return False
     if db.scalar(select(User.id).limit(1)) is not None:
         return False
 
-    email = os.getenv("INITIAL_ADMIN_EMAIL", "admin@pos.local").strip().lower()
     password = os.getenv("INITIAL_ADMIN_PASSWORD", "password123")
     admin = User(email=email, full_name="POS Administrator", role="admin")
     admin.set_password(password)
     db.add(admin)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        if db.scalar(select(User.id).limit(1)) is not None:
+            return False
+        raise
     return True
 
 

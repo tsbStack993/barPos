@@ -18,10 +18,21 @@ from starlette.middleware.sessions import SessionMiddleware
 
 
 logger = logging.getLogger(__name__)
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./pos.db")
+
+
+def get_database_url() -> str:
+    database_url = os.getenv("DATABASE_URL", "").strip()
+    if not database_url:
+        return "sqlite:///./pos.db"
+    if database_url.startswith("postgres://"):
+        return "postgresql://" + database_url.removeprefix("postgres://")
+    return database_url
+
+
+DATABASE_URL = get_database_url()
 SESSION_SECRET_KEY = os.getenv("SESSION_SECRET_KEY", "local-dev-only-change-this-secret")
 SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "false").lower() == "true"
-connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite:") else {}
 engine = create_engine(DATABASE_URL, connect_args=connect_args, pool_pre_ping=True)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
