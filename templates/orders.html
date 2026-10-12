@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sales history | storePOS</title>
+    <script>
+      (() => {
+        const savedTheme = localStorage.getItem("pos-theme");
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.classList.toggle(
+          "dark",
+          savedTheme ? savedTheme === "dark" : prefersDark
+        );
+      })();
+      window.tailwind = { config: { darkMode: "class" } };
+    </script>
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      html.dark {
+        color-scheme: dark;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        background: #f1f5f9;
+        color: #0f172a;
+      }
+
+      main {
+        box-sizing: border-box;
+        width: min(100% - 2rem, 72rem);
+        margin: 0 auto;
+        padding: 2rem 0;
+      }
+
+      main > header,
+      main > section > div:first-child,
+      main > header > div:last-child {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+
+      main > header {
+        margin-bottom: 2rem;
+      }
+
+      main > section {
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        background: #fff;
+        box-shadow: 0 1px 2px rgb(15 23 42 / 0.06);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 0.75rem 1.25rem;
+        border-bottom: 1px solid #e2e8f0;
+        text-align: left;
+      }
+
+      button {
+        padding: 0.6rem 0.9rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.5rem;
+        background: #fff;
+        color: #334155;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .hidden,
+      [hidden] {
+        display: none !important;
+      }
+
+      input:not([type="hidden"]),
+      select,
+      textarea {
+        box-sizing: border-box;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.625rem;
+        background: #fff;
+        color: #111827;
+      }
+
+      input:not([type="hidden"]):focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgb(59 130 246 / 0.25);
+      }
+
+      html.dark input:not([type="hidden"]),
+      html.dark select,
+      html.dark textarea {
+        border-color: #475569;
+        background: #1e293b;
+        color: #e2e8f0;
+      }
+
+      .flex {
+        display: flex;
+      }
+
+      .items-center {
+        align-items: center;
+      }
+
+      .justify-between {
+        justify-content: space-between;
+      }
+
+      .gap-3 {
+        gap: 0.75rem;
+      }
+
+      html.dark body {
+        background: #020617;
+        color: #e2e8f0;
+      }
+
+      html.dark button {
+        border-color: #475569;
+        background: #1e293b;
+        color: #e2e8f0;
+      }
+
+      html.dark main > section,
+      html.dark main > section > div {
+        border-color: #334155;
+        background: #0f172a;
+      }
+
+      html.dark .bg-white {
+        background-color: #0f172a !important;
+      }
+
+      html.dark .bg-slate-50 {
+        background-color: #1e293b !important;
+      }
+
+      html.dark .bg-slate-100 {
+        background-color: #020617 !important;
+      }
+
+      html.dark .text-slate-900 {
+        color: #f1f5f9 !important;
+      }
+
+      html.dark .text-slate-700,
+      html.dark .text-slate-600 {
+        color: #cbd5e1 !important;
+      }
+
+      html.dark .text-slate-500,
+      html.dark .text-slate-400 {
+        color: #94a3b8 !important;
+      }
+
+      html.dark [class*="border-slate-"],
+      html.dark th,
+      html.dark td {
+        border-color: #334155 !important;
+      }
+
+      html.dark button.bg-white,
+      html.dark a.bg-white {
+        color: #e2e8f0;
+      }
+
+      @media (max-width: 640px) {
+        main > header {
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body class="min-h-screen bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+      <header class="mb-8 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <a href="/" class="text-sm font-semibold text-indigo-700 hover:underline dark:text-indigo-300">← Back to register</a>
+          <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Sales history</h1>
+          <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">Completed transactions and itemized order details.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="text-right">
+            <p class="text-sm font-semibold text-slate-900 dark:text-slate-100">{{ user.full_name }}</p>
+            <p class="text-xs capitalize text-slate-500 dark:text-slate-400">{{ user.role }}</p>
+          </div>
+          <button
+            id="theme-toggle"
+            type="button"
+            aria-pressed="false"
+            class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+          >
+            <span id="theme-toggle-label">Dark mode</span>
+          </button>
+          <button
+            id="refresh-orders"
+            type="button"
+            class="rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700"
+          >
+            Refresh
+          </button>
+          <button
+            id="logout-button"
+            type="button"
+            class="rounded-lg border border-slate-300 bg-white px-4 py-2 font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+          >
+            Log out
+          </button>
+        </div>
+      </header>
+
+      <section class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4 dark:border-slate-700">
+          <h2 class="font-semibold text-slate-900 dark:text-slate-100">Transactions</h2>
+          <p id="order-count" class="text-sm text-slate-500 dark:text-slate-400" aria-live="polite"></p>
+        </div>
+        <p id="orders-message" role="status" aria-live="polite" class="hidden px-5 py-8 text-center text-sm text-slate-600 dark:text-slate-300"></p>
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[48rem] text-left text-sm">
+            <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+              <tr>
+                <th scope="col" class="px-5 py-3 font-semibold">Order</th>
+                <th scope="col" class="px-5 py-3 font-semibold">Date &amp; time</th>
+                <th scope="col" class="px-5 py-3 font-semibold">Items</th>
+                <th scope="col" class="px-5 py-3 font-semibold">Payment</th>
+                <th scope="col" class="px-5 py-3 font-semibold">Cashier</th>
+                <th scope="col" class="px-5 py-3 text-right font-semibold">Total</th>
+                <th scope="col"><span class="sr-only">Details</span></th>
+              </tr>
+            </thead>
+            <tbody id="orders-body" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const ordersBody = document.getElementById("orders-body");
+      const ordersMessage = document.getElementById("orders-message");
+      const orderCount = document.getElementById("order-count");
+      const currency = (value) =>
+        new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(value);
+      const themeToggle = document.getElementById("theme-toggle");
+      const themeToggleLabel = document.getElementById("theme-toggle-label");
+
+      function updateThemeToggle() {
+        const isDark = document.documentElement.classList.contains("dark");
+        themeToggleLabel.textContent = isDark ? "Light mode" : "Dark mode";
+        themeToggle.setAttribute("aria-pressed", String(isDark));
+        themeToggle.setAttribute("aria-label", `Switch to ${isDark ? "light" : "dark"} mode`);
+      }
+
+      updateThemeToggle();
+      themeToggle.addEventListener("click", () => {
+        const isDark = document.documentElement.classList.toggle("dark");
+        localStorage.setItem("pos-theme", isDark ? "dark" : "light");
+        updateThemeToggle();
+      });
+
+      async function loadOrders() {
+        ordersMessage.classList.add("hidden");
+        ordersBody.replaceChildren();
+        try {
+          const response = await fetch("/api/orders");
+          const orders = await response.json();
+          if (!response.ok) throw new Error(orders.detail || "Could not load order history.");
+          orderCount.textContent = `${orders.length} ${orders.length === 1 ? "sale" : "sales"}`;
+
+          if (orders.length === 0) {
+            ordersMessage.textContent = "No completed sales yet.";
+            ordersMessage.classList.remove("hidden");
+            return;
+          }
+
+          for (const order of orders) {
+            const row = document.createElement("tr");
+            row.className = "align-top hover:bg-slate-50 dark:hover:bg-slate-800";
+            const orderCell = document.createElement("td");
+            orderCell.className = "px-5 py-4 font-semibold";
+            orderCell.textContent = `#${order.id}`;
+            const dateCell = document.createElement("td");
+            dateCell.className = "px-5 py-4 text-slate-600 dark:text-slate-300";
+            dateCell.textContent = new Date(order.created_at).toLocaleString();
+            const itemsCell = document.createElement("td");
+            itemsCell.className = "px-5 py-4";
+            const itemCount = order.items.reduce((count, item) => count + item.quantity, 0);
+            itemsCell.textContent = `${itemCount} ${itemCount === 1 ? "item" : "items"}`;
+            const paymentCell = document.createElement("td");
+            paymentCell.className = "px-5 py-4 capitalize text-slate-600 dark:text-slate-300";
+            paymentCell.textContent = order.payment_method;
+            const cashierCell = document.createElement("td");
+            cashierCell.className = "px-5 py-4 text-slate-600 dark:text-slate-300";
+            cashierCell.textContent = order.cashier_name || "Unknown";
+            const totalCell = document.createElement("td");
+            totalCell.className = "px-5 py-4 text-right font-semibold";
+            totalCell.textContent = currency(order.total);
+            const detailCell = document.createElement("td");
+            detailCell.className = "px-5 py-4 text-right";
+            const detailButton = document.createElement("button");
+            detailButton.type = "button";
+            detailButton.className = "text-sm font-semibold text-indigo-700 hover:underline";
+            detailButton.textContent = "Details";
+            detailButton.setAttribute("aria-expanded", "false");
+            detailCell.append(detailButton);
+            row.append(orderCell, dateCell, itemsCell, paymentCell, cashierCell, totalCell, detailCell);
+
+            const detailRow = document.createElement("tr");
+            detailRow.id = `order-details-${order.id}`;
+            detailRow.hidden = true;
+            detailButton.setAttribute("aria-controls", detailRow.id);
+            detailRow.className = "bg-slate-50 dark:bg-slate-800";
+            const detailContent = document.createElement("td");
+            detailContent.colSpan = 7;
+            detailContent.className = "px-5 py-4";
+            const itemList = document.createElement("div");
+            itemList.className = "space-y-2";
+            for (const item of order.items) {
+              const itemRow = document.createElement("div");
+              itemRow.className = "flex flex-wrap justify-between gap-2 text-sm";
+              const itemName = document.createElement("span");
+              itemName.textContent = `${item.name} (${item.sku}) × ${item.quantity} @ ${currency(item.unit_price)}`;
+              const lineTotal = document.createElement("span");
+              lineTotal.className = "font-medium";
+              lineTotal.textContent = currency(item.line_total);
+              itemRow.append(itemName, lineTotal);
+              itemList.append(itemRow);
+            }
+            const summary = document.createElement("div");
+            summary.className = "mt-3 ml-auto max-w-xs space-y-1 border-t border-slate-200 pt-3 text-sm dark:border-slate-700";
+            for (const [label, value] of [
+              ["Subtotal", order.subtotal],
+              [`Discount (${order.discount_type})`, -order.discount_amount],
+              [`Tax (${order.tax_rate}%)`, order.tax_amount],
+              ["Grand total", order.total],
+            ]) {
+              const line = document.createElement("div");
+              line.className = "flex justify-between gap-6";
+              if (label === "Grand total") line.classList.add("font-bold");
+              const title = document.createElement("span");
+              title.textContent = label;
+              const amount = document.createElement("span");
+              amount.textContent = currency(value);
+              line.append(title, amount);
+              summary.append(line);
+            }
+            detailContent.append(itemList, summary);
+            detailRow.append(detailContent);
+            detailButton.addEventListener("click", () => {
+              const willExpand = detailRow.hidden;
+              detailRow.hidden = !willExpand;
+              detailButton.setAttribute("aria-expanded", String(willExpand));
+              detailButton.textContent = willExpand ? "Hide details" : "Details";
+            });
+            ordersBody.append(row, detailRow);
+          }
+        } catch (error) {
+          orderCount.textContent = "";
+          ordersMessage.textContent = error.message;
+          ordersMessage.classList.remove("hidden");
+        }
+      }
+
+      document.getElementById("refresh-orders").addEventListener("click", loadOrders);
+      document.getElementById("logout-button").addEventListener("click", async () => {
+        await fetch("/api/auth/logout", { method: "POST" });
+        window.location.assign("/login");
+      });
+      loadOrders();
+    </script>
+  </body>
+</html>

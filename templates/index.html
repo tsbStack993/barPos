@@ -1,0 +1,1252 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>storePOS | Register</title>
+    <script>
+      (() => {
+        const savedTheme = localStorage.getItem("pos-theme");
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.classList.toggle(
+          "dark",
+          savedTheme ? savedTheme === "dark" : prefersDark
+        );
+      })();
+      window.tailwind = { config: { darkMode: "class" } };
+    </script>
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      html.dark {
+        color-scheme: dark;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        background: #f1f5f9;
+        color: #0f172a;
+      }
+
+      main {
+        box-sizing: border-box;
+        width: min(100% - 2rem, 72rem);
+        margin: 0 auto;
+        padding: 2rem 0;
+      }
+
+      main > header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      main > section {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 20rem;
+        gap: 1.5rem;
+      }
+
+      main > section > div,
+      main > section > aside {
+        min-width: 0;
+        padding: 1.5rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        background: #fff;
+        box-shadow: 0 1px 2px rgb(15 23 42 / 0.06);
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+
+      button {
+        padding: 0.6rem 0.9rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.5rem;
+        background: #fff;
+        color: #334155;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .flex {
+        display: flex;
+      }
+
+      .flex-wrap {
+        flex-wrap: wrap;
+      }
+
+      .items-center {
+        align-items: center;
+      }
+
+      .justify-between {
+        justify-content: space-between;
+      }
+
+      .gap-2 {
+        gap: 0.5rem;
+      }
+
+      .gap-3 {
+        gap: 0.75rem;
+      }
+
+      .bg-indigo-600,
+      .bg-emerald-600 {
+        border-color: transparent;
+        color: #fff;
+      }
+
+      .bg-indigo-600 {
+        background: #4f46e5;
+      }
+
+      .bg-emerald-600 {
+        background: #059669;
+      }
+
+      #barcode-form > div {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      #barcode-input {
+        flex: 1;
+      }
+
+      button:disabled {
+        cursor: not-allowed;
+        opacity: 0.65;
+      }
+
+      input:not([type="hidden"]),
+      select,
+      textarea {
+        box-sizing: border-box;
+        max-width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.625rem;
+        background: #fff;
+        color: #0f172a;
+        transition: border-color 150ms ease, box-shadow 150ms ease;
+      }
+
+      input:not([type="hidden"]):focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgb(59 130 246 / 0.25);
+      }
+
+      input:not([type="hidden"])::placeholder,
+      textarea::placeholder {
+        color: #64748b;
+      }
+
+      .form-control {
+        width: 100%;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        background: #fff;
+        color: #111827;
+      }
+
+      html.dark .form-control {
+        border-color: #374151;
+        background: #1f2937;
+        color: #f3f4f6;
+      }
+
+      #barcode-input {
+        box-sizing: border-box;
+        width: 100%;
+      }
+
+      #product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+        gap: 0.75rem;
+      }
+
+      #product-grid button {
+        padding: 0.75rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        background: #fff;
+        color: #0f172a;
+        text-align: left;
+      }
+
+      #product-grid button:hover {
+        border-color: #818cf8;
+        box-shadow: 0 4px 12px rgb(15 23 42 / 0.08);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #e2e8f0;
+        text-align: left;
+      }
+
+      dialog {
+        max-width: calc(100vw - 2rem);
+        max-height: 90vh;
+        overflow: auto;
+        border: 0;
+        border-radius: 0.75rem;
+        background: #fff;
+        color: #0f172a;
+        box-shadow: 0 24px 48px rgb(15 23 42 / 0.22);
+      }
+
+      dialog::backdrop {
+        background: rgb(2 6 23 / 0.55);
+      }
+
+      html.dark body {
+        background: #020617;
+        color: #e2e8f0;
+      }
+
+      html.dark button:not(.bg-indigo-600):not(.bg-emerald-600) {
+        border-color: #475569;
+        background: #1e293b;
+        color: #e2e8f0;
+      }
+
+      html.dark main > section > div,
+      html.dark main > section > aside,
+      html.dark #product-grid button {
+        border-color: #334155;
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+
+      html.dark th,
+      html.dark td {
+        border-color: #334155;
+      }
+
+      html.dark dialog {
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+
+      html.dark #catalog-dialog > div {
+        background-color: #0f172a;
+      }
+
+      html.dark .bg-white {
+        background-color: #0f172a !important;
+      }
+
+      html.dark .bg-slate-50 {
+        background-color: #1e293b !important;
+      }
+
+      html.dark .bg-slate-100 {
+        background-color: #020617 !important;
+      }
+
+      html.dark .text-slate-900 {
+        color: #f1f5f9 !important;
+      }
+
+      html.dark .text-slate-700,
+      html.dark .text-slate-600 {
+        color: #cbd5e1 !important;
+      }
+
+      html.dark .text-slate-500,
+      html.dark .text-slate-400 {
+        color: #94a3b8 !important;
+      }
+
+      html.dark [class*="border-slate-"] {
+        border-color: #334155 !important;
+      }
+
+      html.dark [class*="divide-slate-"] > :not([hidden]) ~ :not([hidden]) {
+        border-color: #334155 !important;
+      }
+
+      html.dark input:not([type="hidden"]),
+      html.dark select,
+      html.dark textarea {
+        border-color: #475569;
+        background-color: #0f172a;
+        color: #e2e8f0;
+      }
+
+      html.dark input::placeholder {
+        color: #94a3b8;
+      }
+
+      html.dark .hover\:bg-slate-50:hover,
+      html.dark .hover\:bg-white:hover {
+        background-color: #1e293b !important;
+      }
+
+      @media (max-width: 800px) {
+        main > section {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      @media print {
+        @page {
+          size: 80mm auto;
+          margin: 0;
+        }
+
+        body * {
+          visibility: hidden !important;
+        }
+
+        #receipt-dialog[open],
+        #receipt-dialog[open] * {
+          visibility: visible !important;
+        }
+
+        #receipt-dialog[open] {
+          position: absolute;
+          inset: 0 auto auto 0;
+          display: block;
+          width: 74mm;
+          max-width: 74mm;
+          margin: 0;
+          padding: 3mm;
+          overflow: visible;
+          border: 0;
+          border-radius: 0;
+          background: #fff;
+          color: #000;
+          box-shadow: none;
+          font-family: monospace;
+          font-size: 10pt;
+        }
+
+        #receipt-dialog::backdrop,
+        .receipt-actions {
+          display: none !important;
+        }
+
+        .receipt-content {
+          width: 100%;
+        }
+
+        .receipt-items {
+          width: 100%;
+          border-collapse: collapse;
+        }
+
+        .receipt-items th,
+        .receipt-items td {
+          padding: 1.5mm 0;
+          text-align: left;
+          vertical-align: top;
+        }
+
+        .receipt-items .receipt-number {
+          text-align: right;
+          white-space: nowrap;
+        }
+
+        .receipt-rule {
+          border: 0;
+          border-top: 1px dashed #000;
+          margin: 2mm 0;
+        }
+
+        .receipt-total {
+          font-size: 12pt;
+          font-weight: 700;
+        }
+      }
+    </style>
+  </head>
+  <body class="min-h-screen bg-slate-100 text-slate-900 transition-colors duration-200 dark:bg-slate-950 dark:text-slate-100">
+    <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+      <header class="mb-8 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-widest text-indigo-600">Point of sale</p>
+          <h1 class="mt-1 text-3xl font-bold tracking-tight">storePOS</h1>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="text-right">
+            <p class="text-sm font-semibold text-slate-900 dark:text-slate-100">{{ user.full_name }}</p>
+            <p class="text-xs capitalize text-slate-500 dark:text-slate-400">{{ user.role }}</p>
+          </div>
+          <button
+            id="theme-toggle"
+            type="button"
+            aria-pressed="false"
+            class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+          >
+            <span id="theme-toggle-label">Dark mode</span>
+          </button>
+          {% if user.role == "admin" %}
+          <a href="/orders" class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700">
+            Sales history
+          </a>
+          <button
+            id="manage-products-button"
+            type="button"
+            class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+          >
+            Manage catalog
+          </button>
+          {% endif %}
+          <button
+            id="logout-button"
+            type="button"
+            class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+          >
+            Log out
+          </button>
+        </div>
+      </header>
+
+      <section class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <div class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800 sm:p-6">
+          <form id="barcode-form">
+            <label for="barcode-input" class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">
+              Scan or enter barcode
+            </label>
+            <div class="flex gap-2">
+              <input
+                id="barcode-input"
+                name="barcode"
+                type="text"
+                autocomplete="off"
+                autofocus
+                placeholder="Scan a product barcode and press Enter"
+                class="form-control min-w-0 flex-1 rounded-lg border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 shadow-sm outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400"
+              />
+              <button
+                type="submit"
+                class="rounded-lg bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              >
+                Add
+              </button>
+            </div>
+          </form>
+          <p id="status-message" role="status" aria-live="polite" class="mt-3 min-h-5 text-sm text-slate-500 dark:text-slate-400">
+            Scan a barcode to add a product to the sale.
+          </p>
+
+          <section class="mt-6" aria-labelledby="product-search-heading">
+            <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+              <h2 id="product-search-heading" class="font-semibold">Products</h2>
+              <label class="sr-only" for="product-search">Search products</label>
+              <input
+                id="product-search"
+                type="search"
+                placeholder="Search name, SKU, or barcode..."
+                class="form-control w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400 sm:max-w-xs"
+              />
+            </div>
+            <div id="product-grid" class="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4" aria-live="polite"></div>
+            <p id="product-grid-empty" class="hidden rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
+              No products match your search.
+            </p>
+          </section>
+
+          <div class="mt-6 overflow-x-auto">
+            <table class="w-full min-w-[38rem] text-left text-sm">
+              <thead class="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                <tr>
+                  <th scope="col" class="px-3 py-3 font-semibold">Product</th>
+                  <th scope="col" class="px-3 py-3 font-semibold">Price</th>
+                  <th scope="col" class="px-3 py-3 font-semibold">Quantity</th>
+                  <th scope="col" class="px-3 py-3 text-right font-semibold">Line total</th>
+                  <th scope="col"><span class="sr-only">Remove</span></th>
+                </tr>
+              </thead>
+              <tbody id="cart-body" class="divide-y divide-slate-100 dark:divide-slate-800">
+                <tr id="empty-cart">
+                  <td colspan="5" class="px-3 py-12 text-center text-slate-500 dark:text-slate-400">
+                    Your cart is empty. Scan a product to get started.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <aside class="h-fit rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800 sm:p-6">
+          <h2 class="text-xl font-semibold tracking-tight">Sale summary</h2>
+          <div class="mt-5 space-y-4 border-t border-slate-200 pt-5 text-sm dark:border-slate-700">
+            <div class="flex items-center justify-between gap-4 py-1"><span class="text-slate-600 dark:text-slate-300">Subtotal</span><span id="cart-subtotal" class="font-medium tabular-nums">$0.00</span></div>
+            <div class="grid grid-cols-[1fr_6rem] items-center gap-2">
+              <label for="tax-rate" class="text-sm leading-5 text-slate-600 dark:text-slate-300">Tax rate (%)</label>
+              <input id="tax-rate" type="number" min="0" max="100" step="0.01" value="0" class="form-control w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100" />
+            </div>
+            <div class="flex items-center justify-between gap-4 py-1"><span class="text-slate-600 dark:text-slate-300">Tax</span><span id="cart-tax" class="font-medium tabular-nums">$0.00</span></div>
+            <div class="grid grid-cols-[1fr_6rem] items-center gap-2">
+              <label for="discount-type" class="text-sm leading-5 text-slate-600 dark:text-slate-300">Discount</label>
+              <select id="discount-type" class="form-control w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100">
+                <option value="flat">Flat ($)</option>
+                <option value="percentage">Percent (%)</option>
+              </select>
+            </div>
+            <div class="grid grid-cols-[1fr_6rem] items-center gap-2">
+              <label for="discount-value" class="text-sm leading-5 text-slate-600 dark:text-slate-300">Discount value</label>
+              <input id="discount-value" type="number" min="0" step="0.01" value="0" class="form-control w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100" />
+            </div>
+            <div class="flex items-center justify-between gap-4 py-1"><span class="text-slate-600 dark:text-slate-300">Discount amount</span><span id="cart-discount" class="font-medium tabular-nums">$0.00</span></div>
+            <div class="grid grid-cols-[1fr_8rem] items-center gap-2">
+              <label for="payment-method" class="text-sm leading-5 text-slate-600 dark:text-slate-300">Payment method</label>
+              <select id="payment-method" class="form-control w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100">
+                <option value="cash">Cash</option>
+                <option value="card">Card</option>
+                <option value="mobile">Mobile payment</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="mt-5 flex items-center justify-between gap-4 rounded-lg border-t border-slate-200 bg-slate-50 px-4 py-4 dark:border-slate-700 dark:bg-slate-800">
+            <span class="text-base font-semibold text-slate-700 dark:text-slate-200">Grand total</span>
+            <span id="cart-total" class="text-2xl font-bold tabular-nums">$0.00</span>
+          </div>
+          <button
+            id="checkout-button"
+            type="button"
+            disabled
+            class="mt-6 w-full rounded-lg bg-emerald-600 px-4 py-3 font-semibold text-white transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300"
+          >
+            Complete sale
+          </button>
+          <p class="mt-3 text-center text-xs text-slate-500">Completing the sale records the order and updates stock.</p>
+        </aside>
+      </section>
+    </main>
+
+    {% if user.role == "admin" %}
+    <dialog
+      id="catalog-dialog"
+      aria-labelledby="catalog-title"
+      class="w-[min(64rem,calc(100%-2rem))] max-h-[90vh] overflow-y-auto rounded-xl p-0 shadow-2xl backdrop:bg-slate-950/50"
+    >
+      <div class="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-5 py-4">
+        <h2 id="catalog-title" class="text-xl font-bold">Manage catalog</h2>
+        <button id="close-catalog-button" type="button" aria-label="Close catalog management" class="rounded px-3 py-1 text-xl text-slate-500 hover:bg-slate-100">×</button>
+      </div>
+      <div class="grid gap-5 p-5 lg:grid-cols-[minmax(0,1fr)_17rem]">
+        <section class="rounded-xl border border-slate-200 bg-slate-50 p-4 px-8 dark:border-slate-700 dark:bg-slate-900">
+          <h3 id="product-form-title" class="text-base font-semibold">Add product</h3>
+          <form id="product-form" class="mt-3 grid gap-3 sm:grid-cols-2">
+            <input id="product-id" type="hidden" />
+            <label class="text-sm font-medium">Name<input id="product-name" required maxlength="200" class="form-control mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100" /></label>
+            <label class="text-sm font-medium">SKU<input id="product-sku" required maxlength="100" class="form-control mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100" /></label>
+            <label class="text-sm font-medium">Barcode<input id="product-barcode" required maxlength="100" class="form-control mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100" /></label>
+            <label class="text-sm font-medium">Price<input id="product-price" type="number" min="0" step="0.01" required class="form-control mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100" /></label>
+            <label class="text-sm font-medium">Stock quantity<input id="product-stock" type="number" min="0" step="1" required class="form-control mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100" /></label>
+            <label class="text-sm font-medium">Category<select id="product-category" class="form-control mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"><option value="">Uncategorized</option></select></label>
+            <div class="flex flex-wrap gap-2 sm:col-span-2">
+              <button id="save-product-button" type="submit" class="rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700">Add product</button>
+              <button id="cancel-product-edit-button" type="button" class="hidden rounded-lg border border-slate-300 px-4 py-2 font-semibold hover:bg-slate-50">Cancel edit</button>
+            </div>
+          </form>
+          <p id="catalog-message" role="status" aria-live="polite" class="mt-3 min-h-5 text-sm text-slate-600"></p>
+          <div id="managed-product-list" class="mt-4 divide-y divide-slate-200"></div>
+        </section>
+        <div class="grid content-start gap-5">
+          <section class="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900">
+            <h3 class="text-base font-semibold">Categories</h3>
+            <form id="category-form" class="mt-3 flex gap-2">
+              <label for="category-name" class="sr-only">New category name</label>
+              <input id="category-name" required maxlength="100" placeholder="New category" class="form-control min-w-0 flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100" />
+              <button type="submit" class="rounded-lg bg-slate-800 px-3 py-2 font-semibold text-white hover:bg-slate-700">Add</button>
+            </form>
+            <div id="managed-category-list" class="mt-4 divide-y divide-slate-200 dark:divide-slate-700"></div>
+          </section>
+          <section class="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900">
+            <h3 class="text-base font-semibold">Cashier accounts</h3>
+            <form id="cashier-form" class="mt-3 space-y-3">
+              <label class="block text-sm font-medium">Full name<input id="cashier-name" required maxlength="150" class="form-control mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100" /></label>
+              <label class="block text-sm font-medium">Email<input id="cashier-email" type="email" required maxlength="254" class="form-control mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100" /></label>
+              <label class="block text-sm font-medium">Temporary password<input id="cashier-password" type="password" required minlength="8" maxlength="72" autocomplete="new-password" class="form-control mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100" /></label>
+              <button type="submit" class="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-700">Create cashier account</button>
+            </form>
+            <div id="managed-cashier-list" class="mt-4 divide-y divide-slate-200 dark:divide-slate-700"></div>
+          </section>
+        </div>
+      </div>
+    </dialog>
+    {% endif %}
+
+    <dialog
+      id="receipt-dialog"
+      aria-labelledby="receipt-title"
+      class="w-[min(28rem,calc(100%-2rem))] rounded-xl p-0 shadow-2xl backdrop:bg-slate-950/50"
+    >
+      <section id="receipt-content" class="receipt-content p-6">
+        <header class="text-center">
+          <h2 id="receipt-title" class="text-xl font-bold">storePOS</h2>
+          <p class="mt-1 text-sm text-slate-600">Sales receipt</p>
+        </header>
+        <div class="mt-5 space-y-1 border-y border-dashed border-slate-300 py-3 text-sm">
+          <p>Order: <span id="receipt-order-id"></span></p>
+          <p>Date: <span id="receipt-date"></span></p>
+          <p>Payment: <span id="receipt-payment"></span></p>
+        </div>
+        <div class="mt-3 overflow-x-auto">
+          <table class="receipt-items w-full text-sm">
+            <thead>
+              <tr class="border-b border-slate-300 text-xs uppercase text-slate-500">
+                <th scope="col" class="py-2">Item</th>
+                <th scope="col" class="py-2 text-right">Qty</th>
+                <th scope="col" class="py-2 text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody id="receipt-items-body" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+        <div class="mt-3 space-y-1 border-t border-dashed border-slate-300 pt-3 text-sm">
+          <p class="flex justify-between"><span>Subtotal</span><span id="receipt-subtotal"></span></p>
+          <p class="flex justify-between"><span>Discount</span><span id="receipt-discount"></span></p>
+          <p class="flex justify-between"><span>Tax</span><span id="receipt-tax"></span></p>
+        </div>
+        <div class="mt-3 flex justify-between border-t border-slate-300 pt-3 text-lg font-bold">
+          <span>Total</span>
+          <span id="receipt-total"></span>
+        </div>
+        <p class="mt-6 text-center text-sm">Thank you for your purchase!</p>
+      </section>
+      <div class="receipt-actions flex gap-3 border-t border-slate-200 bg-slate-50 p-4">
+        <button
+          id="print-receipt-button"
+          type="button"
+          class="flex-1 rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700"
+        >
+          Print receipt
+        </button>
+        <button
+          id="close-receipt-button"
+          type="button"
+          class="rounded-lg border border-slate-300 px-4 py-2 font-semibold text-slate-700 hover:bg-white"
+        >
+          Close
+        </button>
+      </div>
+    </dialog>
+
+    <script>
+      const cart = new Map();
+      const barcodeForm = document.getElementById("barcode-form");
+      const barcodeInput = document.getElementById("barcode-input");
+      const cartBody = document.getElementById("cart-body");
+      const cartTotal = document.getElementById("cart-total");
+      const cartSubtotal = document.getElementById("cart-subtotal");
+      const cartTax = document.getElementById("cart-tax");
+      const cartDiscount = document.getElementById("cart-discount");
+      const checkoutButton = document.getElementById("checkout-button");
+      const statusMessage = document.getElementById("status-message");
+      const receiptDialog = document.getElementById("receipt-dialog");
+      const receiptItemsBody = document.getElementById("receipt-items-body");
+      const printReceiptButton = document.getElementById("print-receipt-button");
+      const closeReceiptButton = document.getElementById("close-receipt-button");
+      const productSearch = document.getElementById("product-search");
+      const productGrid = document.getElementById("product-grid");
+      const productGridEmpty = document.getElementById("product-grid-empty");
+      const catalogDialog = document.getElementById("catalog-dialog");
+      const catalogMessage = document.getElementById("catalog-message");
+      const productForm = document.getElementById("product-form");
+      const categoryForm = document.getElementById("category-form");
+      const cashierForm = document.getElementById("cashier-form");
+      const managedProductList = document.getElementById("managed-product-list");
+      const managedCategoryList = document.getElementById("managed-category-list");
+      const managedCashierList = document.getElementById("managed-cashier-list");
+      const manageProductsButton = document.getElementById("manage-products-button");
+      const themeToggle = document.getElementById("theme-toggle");
+      const themeToggleLabel = document.getElementById("theme-toggle-label");
+      let products = [];
+      let categories = [];
+
+      function updateThemeToggle() {
+        const isDark = document.documentElement.classList.contains("dark");
+        themeToggleLabel.textContent = isDark ? "Light mode" : "Dark mode";
+        themeToggle.setAttribute("aria-pressed", String(isDark));
+        themeToggle.setAttribute("aria-label", `Switch to ${isDark ? "light" : "dark"} mode`);
+      }
+
+      updateThemeToggle();
+      themeToggle.addEventListener("click", () => {
+        const isDark = document.documentElement.classList.toggle("dark");
+        localStorage.setItem("pos-theme", isDark ? "dark" : "light");
+        updateThemeToggle();
+      });
+
+      const currency = (value) =>
+        new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(value);
+
+      function showReceipt(order) {
+        document.getElementById("receipt-order-id").textContent = `#${order.id}`;
+        document.getElementById("receipt-date").textContent = new Date(order.created_at).toLocaleString();
+        document.getElementById("receipt-payment").textContent = order.payment_method;
+        document.getElementById("receipt-subtotal").textContent = currency(order.subtotal);
+        document.getElementById("receipt-discount").textContent = `−${currency(order.discount_amount)}`;
+        document.getElementById("receipt-tax").textContent = currency(order.tax_amount);
+        document.getElementById("receipt-total").textContent = currency(order.total);
+        receiptItemsBody.replaceChildren();
+
+        for (const item of order.items) {
+          const row = document.createElement("tr");
+          const nameCell = document.createElement("td");
+          nameCell.className = "py-2";
+          const name = document.createElement("p");
+          name.className = "font-medium";
+          name.textContent = item.name;
+          const details = document.createElement("p");
+          details.className = "text-xs text-slate-500 dark:text-slate-400";
+          details.textContent = `${currency(item.unit_price)} each · ${item.sku}`;
+          nameCell.append(name, details);
+
+          const quantityCell = document.createElement("td");
+          quantityCell.className = "px-2 py-2 text-right align-top";
+          quantityCell.textContent = String(item.quantity);
+
+          const totalCell = document.createElement("td");
+          totalCell.className = "py-2 text-right align-top";
+          totalCell.textContent = currency(item.line_total);
+          row.append(nameCell, quantityCell, totalCell);
+          receiptItemsBody.append(row);
+        }
+
+        receiptDialog.showModal();
+        window.setTimeout(() => window.print(), 150);
+      }
+
+      function setMessage(message, isError = false) {
+        statusMessage.textContent = message;
+        statusMessage.className = `mt-3 min-h-5 text-sm ${isError ? "text-rose-600 dark:text-rose-400" : "text-slate-500 dark:text-slate-400"}`;
+      }
+
+      async function apiRequest(url, options) {
+        const response = await fetch(url, options);
+        const result = response.status === 204 ? null : await response.json();
+        if (!response.ok) throw new Error(result?.detail || "Request failed.");
+        return result;
+      }
+
+      function money(value) {
+        return Math.round((value + Number.EPSILON) * 100) / 100;
+      }
+
+      function currentPricing(subtotal) {
+        const taxInput = document.getElementById("tax-rate");
+        const discountType = document.getElementById("discount-type").value;
+        const discountInput = document.getElementById("discount-value");
+        const taxRate = Math.min(100, Math.max(0, Number(taxInput.value) || 0));
+        const discountMaximum = discountType === "percentage" ? 100 : subtotal;
+        const discountValue = Math.min(
+          discountMaximum,
+          Math.max(0, Number(discountInput.value) || 0)
+        );
+        taxInput.value = String(taxRate);
+        discountInput.value = String(discountValue);
+        const discountAmount = money(
+          discountType === "percentage" ? subtotal * discountValue / 100 : discountValue
+        );
+        const taxAmount = money((subtotal - discountAmount) * taxRate / 100);
+        return {
+          tax_rate: taxRate,
+          discount_type: discountType,
+          discount_value: discountValue,
+          discount_amount: discountAmount,
+          tax_amount: taxAmount,
+          total: money(subtotal - discountAmount + taxAmount),
+        };
+      }
+
+      function addProductToCart(product) {
+        if (product.stock_qty < 1) {
+          setMessage(`${product.name} is out of stock.`, true);
+          return;
+        }
+        const current = cart.get(product.id);
+        if (current && current.quantity >= product.stock_qty) {
+          setMessage(`Only ${product.stock_qty} ${product.name} in stock.`, true);
+          return;
+        }
+        if (current) current.quantity += 1;
+        else cart.set(product.id, { ...product, quantity: 1 });
+        renderCart();
+        setMessage(`${product.name} added to the cart.`);
+      }
+
+      function renderProductGrid() {
+        const query = productSearch.value.trim().toLocaleLowerCase();
+        const matches = products.filter((product) =>
+          [product.name, product.sku, product.barcode, product.category_name || ""]
+            .some((value) => value.toLocaleLowerCase().includes(query))
+        );
+        productGrid.replaceChildren();
+        productGridEmpty.classList.toggle("hidden", matches.length !== 0);
+
+        for (const product of matches) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.disabled = product.stock_qty < 1;
+          button.className = "rounded-lg border border-slate-200 bg-white p-3 text-left text-slate-900 shadow-sm transition hover:border-indigo-400 hover:shadow disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:border-indigo-500";
+          button.addEventListener("click", () => addProductToCart(product));
+          const name = document.createElement("span");
+          name.className = "block font-semibold";
+          name.textContent = product.name;
+          const category = document.createElement("span");
+          category.className = "mt-1 block text-xs text-slate-500 dark:text-slate-400";
+          category.textContent = product.category_name || product.sku;
+          const details = document.createElement("span");
+          details.className = "mt-2 flex items-center justify-between text-sm";
+          const price = document.createElement("span");
+          price.className = "font-semibold text-indigo-700";
+          price.textContent = currency(product.price);
+          const stock = document.createElement("span");
+          stock.className = "text-xs text-slate-500 dark:text-slate-400";
+          stock.textContent = `Stock: ${product.stock_qty}`;
+          details.append(price, stock);
+          button.append(name, category, details);
+          productGrid.append(button);
+        }
+      }
+
+      async function loadCatalog() {
+        [products, categories] = await Promise.all([
+          apiRequest("/api/products"),
+          apiRequest("/api/categories"),
+        ]);
+        renderProductGrid();
+        if (managedProductList) renderManagedProducts();
+        if (managedCategoryList) renderManagedCategories();
+        renderCategoryOptions();
+      }
+
+      async function loadCashiers() {
+        const users = await apiRequest("/api/users");
+        managedCashierList.replaceChildren();
+        for (const user of users.filter((entry) => entry.role === "cashier")) {
+          const row = document.createElement("div");
+          row.className = "py-3";
+          const name = document.createElement("p");
+          name.className = "text-sm font-medium";
+          name.textContent = user.full_name;
+          const email = document.createElement("p");
+          email.className = "text-xs text-slate-500";
+          email.textContent = user.email;
+          row.append(name, email);
+          managedCashierList.append(row);
+        }
+      }
+
+      function renderCategoryOptions(selectedId = "") {
+        const select = document.getElementById("product-category");
+        if (!select) return;
+        select.replaceChildren(new Option("Uncategorized", ""));
+        for (const category of categories) {
+          select.add(new Option(category.name, String(category.id)));
+        }
+        select.value = selectedId === null ? "" : String(selectedId);
+      }
+
+      function renderManagedProducts() {
+        managedProductList.replaceChildren();
+        for (const product of products) {
+          const row = document.createElement("div");
+          row.className = "flex flex-wrap items-center justify-between gap-3 py-3";
+          const description = document.createElement("div");
+          const name = document.createElement("p");
+          name.className = "font-medium";
+          name.textContent = product.name;
+          const detail = document.createElement("p");
+          detail.className = "text-xs text-slate-500 dark:text-slate-400";
+          detail.textContent = `${product.sku} · ${product.barcode} · ${currency(product.price)} · Stock ${product.stock_qty}`;
+          description.append(name, detail);
+          const actions = document.createElement("div");
+          actions.className = "flex gap-2";
+          actions.append(
+            makeButton("Edit", "rounded border border-slate-300 px-3 py-1 text-sm hover:bg-slate-50", () => editProduct(product), `Edit ${product.name}`),
+            makeButton("Delete", "rounded border border-rose-200 px-3 py-1 text-sm text-rose-700 hover:bg-rose-50", () => deleteProduct(product), `Delete ${product.name}`)
+          );
+          row.append(description, actions);
+          managedProductList.append(row);
+        }
+      }
+
+      function renderManagedCategories() {
+        managedCategoryList.replaceChildren();
+        for (const category of categories) {
+          const row = document.createElement("div");
+          row.className = "flex items-center justify-between gap-2 border-b border-slate-200 py-3 dark:border-slate-700";
+          const name = document.createElement("span");
+          name.className = "text-sm font-medium";
+          name.textContent = category.name;
+          const actions = document.createElement("div");
+          actions.className = "flex gap-2";
+          actions.append(
+            makeButton("Rename", "text-xs font-semibold text-indigo-700 hover:underline", () => renameCategory(category), `Rename ${category.name}`),
+            makeButton("Delete", "text-xs font-semibold text-rose-700 hover:underline", () => deleteCategory(category), `Delete ${category.name}`)
+          );
+          row.append(name, actions);
+          managedCategoryList.append(row);
+        }
+      }
+
+      function editProduct(product) {
+        document.getElementById("product-id").value = String(product.id);
+        document.getElementById("product-name").value = product.name;
+        document.getElementById("product-sku").value = product.sku;
+        document.getElementById("product-barcode").value = product.barcode;
+        document.getElementById("product-price").value = String(product.price);
+        document.getElementById("product-stock").value = String(product.stock_qty);
+        renderCategoryOptions(product.category_id);
+        document.getElementById("product-form-title").textContent = "Edit product";
+        document.getElementById("save-product-button").textContent = "Save changes";
+        document.getElementById("cancel-product-edit-button").classList.remove("hidden");
+        document.getElementById("product-name").focus();
+      }
+
+      function resetProductForm() {
+        productForm.reset();
+        document.getElementById("product-id").value = "";
+        document.getElementById("product-form-title").textContent = "Add product";
+        document.getElementById("save-product-button").textContent = "Add product";
+        document.getElementById("cancel-product-edit-button").classList.add("hidden");
+        renderCategoryOptions();
+      }
+
+      async function deleteProduct(product) {
+        if (!window.confirm(`Delete ${product.name}?`)) return;
+        try {
+          await apiRequest(`/api/products/${product.id}`, { method: "DELETE" });
+          if (cart.has(product.id)) cart.delete(product.id);
+          await loadCatalog();
+          renderCart();
+          catalogMessage.textContent = `${product.name} deleted.`;
+        } catch (error) {
+          catalogMessage.textContent = error.message;
+        }
+      }
+
+      async function renameCategory(category) {
+        const name = window.prompt("Category name", category.name);
+        if (name === null || !name.trim()) return;
+        try {
+          await apiRequest(`/api/categories/${category.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: name.trim() }),
+          });
+          await loadCatalog();
+          catalogMessage.textContent = "Category updated.";
+        } catch (error) {
+          catalogMessage.textContent = error.message;
+        }
+      }
+
+      async function deleteCategory(category) {
+        if (!window.confirm(`Delete category "${category.name}"? Products will become uncategorized.`)) return;
+        try {
+          await apiRequest(`/api/categories/${category.id}`, { method: "DELETE" });
+          await loadCatalog();
+          catalogMessage.textContent = "Category deleted.";
+        } catch (error) {
+          catalogMessage.textContent = error.message;
+        }
+      }
+
+      function makeButton(label, className, onClick, accessibleLabel) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = label;
+        button.className = className;
+        button.setAttribute("aria-label", accessibleLabel);
+        button.addEventListener("click", onClick);
+        return button;
+      }
+
+      function renderCart() {
+        cartBody.replaceChildren();
+        let subtotal = 0;
+
+        if (cart.size === 0) {
+          const row = document.createElement("tr");
+          const cell = document.createElement("td");
+          cell.colSpan = 5;
+          cell.className = "px-3 py-12 text-center text-slate-500 dark:text-slate-400";
+          cell.textContent = "Your cart is empty. Scan a product to get started.";
+          row.append(cell);
+          cartBody.append(row);
+        }
+
+        for (const item of cart.values()) {
+          const lineTotal = item.price * item.quantity;
+          subtotal += lineTotal;
+          const row = document.createElement("tr");
+
+          const productCell = document.createElement("td");
+          productCell.className = "px-3 py-4";
+          const productName = document.createElement("p");
+          productName.className = "font-medium text-slate-900 dark:text-slate-100";
+          productName.textContent = item.name;
+          const productSku = document.createElement("p");
+          productSku.className = "mt-1 text-xs text-slate-500 dark:text-slate-400";
+          productSku.textContent = `SKU: ${item.sku}`;
+          productCell.append(productName, productSku);
+
+          const priceCell = document.createElement("td");
+          priceCell.className = "px-3 py-4 text-slate-600 dark:text-slate-300";
+          priceCell.textContent = currency(item.price);
+
+          const quantityCell = document.createElement("td");
+          quantityCell.className = "px-3 py-4";
+          const quantityControls = document.createElement("div");
+          quantityControls.className = "flex items-center gap-2";
+          quantityControls.append(
+            makeButton(
+              "−",
+              "h-8 w-8 rounded border border-slate-300 text-lg leading-none hover:bg-slate-50",
+              () => {
+                if (item.quantity === 1) cart.delete(item.id);
+                else item.quantity -= 1;
+                renderCart();
+              },
+              `Decrease ${item.name} quantity`
+            )
+          );
+          const quantity = document.createElement("span");
+          quantity.className = "min-w-5 text-center font-medium";
+          quantity.textContent = String(item.quantity);
+          quantityControls.append(quantity);
+          quantityControls.append(
+            makeButton(
+              "+",
+              "h-8 w-8 rounded border border-slate-300 text-lg leading-none hover:bg-slate-50",
+              () => {
+                if (item.quantity < item.stock_qty) {
+                  item.quantity += 1;
+                  renderCart();
+                } else {
+                  setMessage(`Only ${item.stock_qty} ${item.name} in stock.`, true);
+                }
+              },
+              `Increase ${item.name} quantity`
+            )
+          );
+          quantityCell.append(quantityControls);
+
+          const lineTotalCell = document.createElement("td");
+          lineTotalCell.className = "px-3 py-4 text-right font-medium";
+          lineTotalCell.textContent = currency(lineTotal);
+
+          const removeCell = document.createElement("td");
+          removeCell.className = "px-2 py-4 text-right";
+          removeCell.append(
+            makeButton(
+              "×",
+              "rounded px-2 py-1 text-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600",
+              () => {
+                cart.delete(item.id);
+                renderCart();
+              },
+              `Remove ${item.name} from cart`
+            )
+          );
+
+          row.append(productCell, priceCell, quantityCell, lineTotalCell, removeCell);
+          cartBody.append(row);
+        }
+
+        subtotal = money(subtotal);
+        const pricing = currentPricing(subtotal);
+        cartSubtotal.textContent = currency(subtotal);
+        cartTax.textContent = currency(pricing.tax_amount);
+        cartDiscount.textContent = `−${currency(pricing.discount_amount)}`;
+        cartTotal.textContent = currency(pricing.total);
+        checkoutButton.disabled = cart.size === 0;
+      }
+
+      productSearch.addEventListener("input", renderProductGrid);
+      for (const inputId of ["tax-rate", "discount-type", "discount-value"]) {
+        document.getElementById(inputId).addEventListener("input", renderCart);
+        document.getElementById(inputId).addEventListener("change", renderCart);
+      }
+
+      if (manageProductsButton) {
+        manageProductsButton.addEventListener("click", async () => {
+          catalogDialog.showModal();
+          catalogMessage.textContent = "";
+          try {
+            await loadCatalog();
+            await loadCashiers();
+          } catch (error) {
+            catalogMessage.textContent = error.message;
+          }
+        });
+        document.getElementById("close-catalog-button").addEventListener("click", () => catalogDialog.close());
+        document.getElementById("cancel-product-edit-button").addEventListener("click", resetProductForm);
+
+        productForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const id = document.getElementById("product-id").value;
+          const product = {
+            name: document.getElementById("product-name").value.trim(),
+            sku: document.getElementById("product-sku").value.trim(),
+            barcode: document.getElementById("product-barcode").value.trim(),
+            price: Number(document.getElementById("product-price").value),
+            stock_qty: Number(document.getElementById("product-stock").value),
+            category_id: document.getElementById("product-category").value
+              ? Number(document.getElementById("product-category").value)
+              : null,
+          };
+          try {
+            await apiRequest(id ? `/api/products/${id}` : "/api/products", {
+              method: id ? "PUT" : "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(product),
+            });
+            resetProductForm();
+            await loadCatalog();
+            catalogMessage.textContent = id ? "Product updated." : "Product created.";
+          } catch (error) {
+            catalogMessage.textContent = error.message;
+          }
+        });
+
+        categoryForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const input = document.getElementById("category-name");
+          try {
+            await apiRequest("/api/categories", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ name: input.value.trim() }),
+            });
+            categoryForm.reset();
+            await loadCatalog();
+            catalogMessage.textContent = "Category created.";
+          } catch (error) {
+            catalogMessage.textContent = error.message;
+          }
+        });
+
+        cashierForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const cashier = {
+            full_name: document.getElementById("cashier-name").value.trim(),
+            email: document.getElementById("cashier-email").value.trim(),
+            password: document.getElementById("cashier-password").value,
+          };
+          try {
+            await apiRequest("/api/users", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(cashier),
+            });
+            cashierForm.reset();
+            await loadCashiers();
+            catalogMessage.textContent = "Cashier account created.";
+          } catch (error) {
+            catalogMessage.textContent = error.message;
+          }
+        });
+      }
+
+      barcodeForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const barcode = barcodeInput.value.trim();
+        if (!barcode) {
+          barcodeInput.focus();
+          return;
+        }
+
+        try {
+          const response = await fetch(`/api/products/barcode/${encodeURIComponent(barcode)}`);
+          const product = await response.json();
+          if (!response.ok) throw new Error(product.detail || "Could not find that product.");
+          if (product.stock_qty < 1) throw new Error(`${product.name} is out of stock.`);
+
+          addProductToCart(product);
+        } catch (error) {
+          setMessage(error.message, true);
+        } finally {
+          barcodeInput.value = "";
+          barcodeInput.focus();
+        }
+      });
+
+      checkoutButton.addEventListener("click", async () => {
+        if (cart.size === 0) return;
+        checkoutButton.disabled = true;
+        barcodeInput.disabled = true;
+
+        try {
+          const response = await fetch("/api/orders", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              items: Array.from(cart.values(), ({ id, quantity }) => ({
+                product_id: id,
+                quantity,
+              })),
+              tax_rate: Number(document.getElementById("tax-rate").value) || 0,
+              discount_type: document.getElementById("discount-type").value,
+              discount_value: Number(document.getElementById("discount-value").value) || 0,
+              payment_method: document.getElementById("payment-method").value,
+            }),
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.detail || "Could not complete the sale.");
+
+          cart.clear();
+          renderCart();
+          setMessage(`Sale #${result.id} completed. Total: ${currency(result.total)}.`);
+          showReceipt(result);
+          loadCatalog().catch((error) =>
+            setMessage(`Sale completed, but the product grid could not refresh: ${error.message}`, true)
+          );
+        } catch (error) {
+          setMessage(error.message, true);
+        } finally {
+          barcodeInput.disabled = false;
+          checkoutButton.disabled = cart.size === 0;
+          barcodeInput.focus();
+        }
+      });
+
+      printReceiptButton.addEventListener("click", () => window.print());
+      closeReceiptButton.addEventListener("click", () => receiptDialog.close());
+      receiptDialog.addEventListener("close", () => barcodeInput.focus());
+      document.getElementById("logout-button").addEventListener("click", async () => {
+        await fetch("/api/auth/logout", { method: "POST" });
+        window.location.assign("/login");
+      });
+      loadCatalog().catch((error) => setMessage(`Could not load products: ${error.message}`, true));
+    </script>
+  </body>
+</html>

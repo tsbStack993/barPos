@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign in | storePOS</title>
+    <script>
+      (() => {
+        const savedTheme = localStorage.getItem("pos-theme");
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.classList.toggle(
+          "dark",
+          savedTheme ? savedTheme === "dark" : prefersDark
+        );
+      })();
+      window.tailwind = { config: { darkMode: "class" } };
+    </script>
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      html.dark {
+        color-scheme: dark;
+      }
+
+      body {
+        box-sizing: border-box;
+        display: grid;
+        min-height: 100vh;
+        margin: 0;
+        place-items: center;
+        padding: 1rem;
+        background: #f1f5f9;
+        color: #0f172a;
+      }
+
+      main {
+        width: min(100%, 28rem);
+        box-sizing: border-box;
+        padding: 2rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        background: #fff;
+        box-shadow: 0 12px 28px rgb(15 23 42 / 0.1);
+      }
+
+      input,
+      button {
+        box-sizing: border-box;
+        width: 100%;
+        font: inherit;
+      }
+
+      input:not([type="hidden"]),
+      select,
+      textarea {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 0.625rem 0.75rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.5rem;
+        background: #fff;
+        color: #0f172a;
+      }
+
+      input:not([type="hidden"]):focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgb(59 130 246 / 0.25);
+      }
+
+      .hidden,
+      [hidden] {
+        display: none !important;
+      }
+
+      button {
+        padding: 0.7rem 1rem;
+        border: 1px solid #4f46e5;
+        border-radius: 0.5rem;
+        background: #4f46e5;
+        color: #fff;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      form > div {
+        margin-bottom: 1rem;
+      }
+
+      html.dark body {
+        background: #020617;
+        color: #e2e8f0;
+      }
+
+      html.dark main {
+        border-color: #334155;
+        background: #0f172a;
+      }
+
+      html.dark .text-slate-600 {
+        color: #cbd5e1 !important;
+      }
+
+      html.dark input:not([type="hidden"]),
+      html.dark select,
+      html.dark textarea {
+        border-color: #475569;
+        background: #020617;
+        color: #f1f5f9;
+      }
+
+    </style>
+  </head>
+  <body class="flex min-h-screen items-center justify-center bg-slate-100 px-4 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <main class="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+      <header class="mb-7 text-center">
+        <p class="text-sm font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">storePOS</p>
+        <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Sign in</h1>
+        <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Use your staff account to open the POS register.</p>
+      </header>
+      <form id="login-form" class="mt-7 space-y-5">
+        <div>
+          <label for="email" class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">Email</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autocomplete="username"
+            required
+            autofocus
+            class="form-control w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-gray-900 outline-none focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+          />
+        </div>
+        <div>
+          <label for="password" class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+            class="form-control w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-gray-900 outline-none focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+          />
+        </div>
+        <p id="login-error" role="alert" aria-live="polite" class="hidden text-sm text-rose-600"></p>
+        <button
+          id="login-button"
+          type="submit"
+          class="w-full rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-wait disabled:opacity-60"
+        >
+          Sign in
+        </button>
+      </form>
+    </main>
+    <script>
+      const form = document.getElementById("login-form");
+      const errorMessage = document.getElementById("login-error");
+      const loginButton = document.getElementById("login-button");
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        errorMessage.classList.add("hidden");
+        loginButton.disabled = true;
+        try {
+          const response = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: document.getElementById("email").value,
+              password: document.getElementById("password").value,
+            }),
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.detail || "Could not sign in.");
+          window.location.assign("/");
+        } catch (error) {
+          errorMessage.textContent = error.message;
+          errorMessage.classList.remove("hidden");
+        } finally {
+          loginButton.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>
