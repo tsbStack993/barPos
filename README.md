@@ -1,15 +1,15 @@
 
-# Barcode POS System
+# [Barcode POS System](https://barpos-84sb.onrender.com/)
 
 A secure, responsive, role-based Point of Sale (POS) web application built for fast retail checkouts, thermal receipt printing, and inventory management.
 
-## 🚀 Tech Stack
+## Tech Stack
 * **Backend:** FastAPI (Python) with SQLAlchemy ORM
 * **Frontend:** Tailwind CSS, responsive grid layouts, and HTML templates with dark mode support
 * **Database:** SQLite (local development) / PostgreSQL / Neon (production cloud deployment)
 * **Containerization:** Docker & Docker Compose
 
-## ✨ Key Features
+## Key Features
 * **Barcode & Manual Product Search:** Instant product lookup via barcode SKU or a clickable visual grid.
 * **Role-Based Access Control (RBAC):** 
   * **Admin:** Full access to product CRUD, category management, cashier provisioning, and sales history logs.
@@ -19,7 +19,7 @@ A secure, responsive, role-based Point of Sale (POS) web application built for f
 * **Receipt Generation:** Instant 80mm thermal-printer layout triggered automatically after checkout.
 * **Dark Mode:** Seamless light and dark theme switching.
 
-## 🛠️ Local Development (Docker)
+## Local Development (Docker)
 1. Clone the repository:
 ```bash
 git clone https://github.com/tsbStack993/barPos.git
@@ -39,7 +39,7 @@ cd barPos
 
 
 
-## ⚙️ Environment Variables
+## Environment Variables
 
 For production deployment (e.g., Render, Railway, or Neon), configure the following environment variables:
 
